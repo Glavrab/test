@@ -1,8 +1,13 @@
 from flask import Flask
-from library import parsing_data, send_message, \
-                    working_with_command, delete_dog, \
-                    show_all_dogs, add_new_dog, \
-                    changing_info_about_dog
+from library import (
+    add_new_dog,
+    changing_info_about_dog,
+    delete_dog,
+    parsing_data,
+    send_message,
+    show_all_dogs,
+    working_with_command,
+)
 
 
 app = Flask(__name__)
