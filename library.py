@@ -1,7 +1,7 @@
 import requests
 from requests import Response
 from flask import request
-
+from uuid import uuid4
 url = 'https://api.telegram.org/bot1678177422:AAFAOiyRFhiIN6yFa2SeBleOaoQjnm9aeJ0/'
 
 
@@ -63,3 +63,53 @@ def looking_for_a_dog(data: dict, name: str):
                 return user_dog_id
     except KeyError:
         return 'Такой собаки нет('
+
+
+def show_all_dogs(data: dict, data_base: dict) -> dict:
+    data['text'] = str(data_base)
+    send_message(data)
+    return data
+
+
+def add_new_dog(data: dict, data_base: dict) -> None:
+    new_dog = adding_a_dog(working_with_command(data['text']))
+    if new_dog != {}:
+        data_base[str(uuid4())] = new_dog
+        data['text'] = 'Собака успешно добавлена!'
+        send_message(data)
+        return
+    data['text'] = 'Не хватает аргументов'
+    send_message(data)
+
+
+def delete_dog(data: dict, data_base: dict) -> None:
+    info = working_with_command(data['text'])
+    name = info[1]
+    user_dog_id = looking_for_a_dog(data=data_base, name=name)
+    try:
+        if user_dog_id != 'Такой собаки нет(':
+            del data_base[user_dog_id]
+            data['text'] = 'Собака успешно удалена!'
+            send_message(data)
+    except KeyError:
+        data['text'] = 'Такой собаки нет('
+        send_message(data)
+
+
+def changing_info_about_dog(data: dict, data_base: dict) -> None:
+    info = working_with_command(data['text'])
+    old_name = info[1]
+    user_dog_id = looking_for_a_dog(data=data_base, name=old_name)
+    try:
+        if user_dog_id != 'Такой собаки нет(':
+            user_dog = changing_a_dog(info)
+            if user_dog != {}:
+                data_base[user_dog_id] = user_dog
+                data['text'] = 'Информация о собаке изменена!'
+                send_message(data)
+            elif user_dog == {}:
+                data['text'] = 'Не хватает аргументов'
+                send_message(data)
+    except KeyError:
+        data['text'] = 'Такой собаки нет('
+        send_message(data)
